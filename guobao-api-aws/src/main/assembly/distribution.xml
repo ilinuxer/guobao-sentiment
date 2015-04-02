@@ -17,6 +17,7 @@
 				<include>logback.xml</include>
 				<include>mybatis-config.xml</include>
 				<include>twitter-apps.properties</include>
+				<include>posturls.properties</include>
 			</includes>
 			<outputDirectory>/conf</outputDirectory>
 			<filtered>true</filtered>

@@ -8,8 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import twitter4j.User;
 import zx.soft.api.adduser.common.MybatisConfig;
+import zx.soft.api.adduser.common.PostUrlConfig;
 import zx.soft.api.adduser.dao.server.MonitorUserDaoServer;
 import zx.soft.api.adduser.gplus.MonitorUserGplus;
+import zx.soft.api.adduser.post.RestletPost;
 import zx.soft.api.adduser.twitter.MonitorUserTwitter;
 import zx.soft.api.domain.ErrorResponse;
 import zx.soft.api.domain.GplusUserInfos;
@@ -19,11 +21,13 @@ import zx.soft.api.url.UrlResources;
 import zx.soft.model.aws.SimpleUser;
 import zx.soft.model.aws.SnapShot;
 import zx.soft.utils.checksum.CheckSumUtils;
+import zx.soft.utils.json.JsonUtils;
 import zx.soft.utils.log.LogbackUtil;
 import zx.soft.utils.time.TimeUtils;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Properties;
 
 @Controller
 @RequestMapping("/aws")
@@ -75,12 +79,12 @@ public class AwsController {
                         String id = person.getId();
                         if (person.getUrl().contains(lowUserName)) {
                             insertIntoGplusUserDB(person);
-                            result = person.getId()+"";
+                            result = person.getId();
                             break;
                         }
                         if (url.contains(id)) {
                             insertIntoGplusUserDB(person);
-                            result = person.getId()+"";
+                            result = person.getId();
                             break;
                         }
                     }
@@ -124,18 +128,40 @@ public class AwsController {
 
     }
 
-    private void insertIntoGplusUserDB(Person person){
-        daoServer.addGplusListern(person.getId(),person.getDisplayName());
-        daoServer.addGplusUserInfo(new GplusUserInfos(person.getDisplayName(), person.getEtag(),
+    private GplusUserInfos getGplusUserInfos(Person person){
+        return new GplusUserInfos(person.getDisplayName(), person.getEtag(),
                 person.getId(), person.getImage().getUrl(), person.getKind(),
-                person.getObjectType(),person.getUrl()));
+                person.getObjectType(),person.getUrl());
     }
 
-    private void insertIntoTwitterUserInfos(User person){
-        daoServer.addTwitterUserInfo(new TwitterUserInfos(person.getId(),person.getName(),
+    private TwitterUserInfos getTwitterUserInfos(User person){
+        System.out.println(JsonUtils.toJson(person));
+        return new TwitterUserInfos(person.getId(),person.getName(),
                 person.getScreenName(),person.getProfileImageURL(), TimeUtils.transStrToCommonDateStr(person.getCreatedAt().toString()),
                 person.getLocation(),person.getURL(),person.getFavouritesCount(),person.getUtcOffset(),
                 person.getListedCount(),person.getFollowersCount(),person.getLang(),person.getDescription(),
-                person.isVerified(),person.getTimeZone(),person.getStatusesCount(),person.getFriendsCount()));
+                person.isVerified(),person.getTimeZone(),person.getStatusesCount(),person.getFriendsCount());
     }
+
+    private void insertIntoGplusUserDB(Person person){
+        GplusUserInfos personInfo = getGplusUserInfos(person);
+        daoServer.addGplusListern(person.getId(),person.getDisplayName());
+        daoServer.addGplusUserInfo(personInfo);
+        String url = getPostUrl("guobao.gplus.url");
+        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+    }
+
+    private void insertIntoTwitterUserInfos(User person){
+
+        TwitterUserInfos personInfo = getTwitterUserInfos(person);
+        daoServer.addTwitterUserInfo(personInfo);
+        String url = getPostUrl("guobao.twitter.url");
+        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+    }
+
+    private String getPostUrl(String urlName){
+        Properties properties = PostUrlConfig.getProp("posturls.properties");
+        return properties.getProperty(urlName);
+    }
+
 }

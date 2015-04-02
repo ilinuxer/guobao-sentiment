@@ -68,23 +68,6 @@
 			<name>Apache 2</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>all</distribution>
-			<comments>Copyright 2015 (c) Gang Wang - All Right Reserved</comments>
 		</license>
 	</licenses>
-
-	<developers>
-		<developer>
-			<id>wgybzb</id>
-			<name>Gang Wang</name>
-			<email>wanggang@zxisl.com</email>
-			<url>http://github.com/wgybzbrobot</url>
-			<roles>
-				<role>ReleaseManager</role>
-				<role>Designer</role>
-				<role>Developer</role>
-			</roles>
-			<timezone>UTC-8</timezone>
-		</developer>
-	</developers>
-
 </project>

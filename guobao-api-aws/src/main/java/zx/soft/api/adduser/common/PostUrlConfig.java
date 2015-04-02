@@ -8,10 +8,10 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Created by jimbo on 15-3-31.
+ * Created by jimbo on 15-4-2.
  */
-public class TwitterAppConfig {
-    private static Logger logger = LoggerFactory.getLogger(TwitterAppConfig.class);
+public class PostUrlConfig {
+    private static Logger logger = LoggerFactory.getLogger(PostUrlConfig.class);
 
     public static Properties getProp(String fileName){
         Properties result = new Properties();
@@ -19,7 +19,7 @@ public class TwitterAppConfig {
             result.load(inputStream);
             return result;
         } catch (IOException e) {
-            logger.error("wrong during reading "+fileName);
+            logger.error("wrong during reading " + fileName);
             throw new RuntimeException(e);
         }
     }
