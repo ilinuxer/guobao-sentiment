@@ -1,0 +1,6 @@
+
+POST用户：
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/aws/users --data '[{"uid":"twitter-id","name":"twitter-name","sns":"tw"},{"uid":"facebook-id","name":"facebook-name","sns":"fb"},{"uid":"googleplus-id","name":"googleplus-name","sns":"gp"}]'
+
+POST快照地址：
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/aws/snapshot --data '["http://www.twitter.com","http://www.facebook.com","http://www.googleplus.com"]'

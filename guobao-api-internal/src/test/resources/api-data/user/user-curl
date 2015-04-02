@@ -1,0 +1,17 @@
+POST:
+
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/user/tw --data '[{"id":1234567891,"name":"用户姓名1","screen_name":"昵称1","profile_image_url":"http://www.head.info1","created_at":"2000-01-01 15:26:19","location":"用户所在城市1","url":"http://www.main.page1","favourites_count":1001,"utc_offset":-34561,"listed_count":2001,"followers_count":3001,"lang":"母语或者主要语言1","description":"描述信息1","verified":true,"time_zone":"时区1","statuses_count":4001,"friends_count":5001},{"id":12345678922,"name":"用户姓名2","screen_name":"昵称2","profile_image_url":"http://www.head.info2","created_at":"2000-01-01 15:26:19","location":"用户所在城市2","url":"http://www.main.page2","favourites_count":1002,"utc_offset":-34562,"listed_count":2002,"followers_count":3002,"lang":" 母语或者主要语言2","description":"描述信息2","verified":true,"time_zone":"时区2","statuses_count":4002,"friends_count":5002}]'
+
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/user/gp --data '[{"id":"执行人的个人资源ID1","display_name":"昵称1","name":"姓名1","url":"http://www.google.com1","image_url":"http://www.image.url1"},{"id":"执行人的个人资源ID2","display_name":"昵称2","name":"姓名2","url":"http://www.google.com2","image_url":"http://www.image.url2"}]'
+
+GET:
+
+$ curl http://localhost:8888/user/tw/1234567891,12345678922 
+
+$ curl http://localhost:8888/user/gp/执行人的个人资源ID1,执行人的个人资源ID2  
+
+DELETE:
+
+$ curl -X DELETE http://localhost:8888/user/tw/1234567891,12345678922  
+
+$ curl -X DELETE http://localhost:8888/user/gp/执行人的个人资源ID1,执行人的个人资源ID2

@@ -1,0 +1,23 @@
+POST:
+
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/oauth/tw --data '[{"username":"twitter-user1","password":"twitter-user1-password","consumer_key":"twitter-user1-consumer-key","consumer_secret":"twitter-user1-consumer-secret","access_token":"twitter-user1-access-token","token_secret":"twitter-user1-token-secret","since_id":0},{"username":"twitter-user2","password":"twitter-user2-password","consumer_key":"twitter-user2-consumer-key","consumer_secret":"twitter-user2-consumer-secret","access_token":"twitter-user2-access-token","token_secret":"twitter-user2-token-secret","since_id":123456789}]'
+
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/oauth/fb --data '[{"username":"facebook-user1","password":"facebook-user1-password","consumer_key":"facebook-user1-consumer-key","consumer_secret":"facebook-user1-consumer-secret","access_token":"facebook-user1-access-token","expires_at":"2015-03-04 15:26:19"},{"username":"facebook-user2","password":"facebook-user2-password","consumer_key":"facebook-user2-consumer-key","consumer_secret":"facebook-user2-consumer-secret","access_token":"facebook-user2-access-token","expires_at":"2015-03-07 15:26:19"}]'
+
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/oauth/gp --data '[{"username":"googleplus-user1","password":"googleplus-user1-password","app_name":"googleplus-user1-app-name","client_id":"googleplus-user1-client-id","client_secret":"googleplus-user1-client-secret"},{"username":"googleplus-user2","password":"googleplus-user2-password","app_name":"googleplus-user2-app-name","client_id":"googleplus-user2-client-id","client_secret":"googleplus-user12-client-secret"}]'
+
+GET:
+
+$ curl http://localhost:8888/oauth/tw/twitter-user1,twitter-user2
+
+$ curl http://localhost:8888/oauth/fb/facebook-user1,facebook-user2  
+
+$ curl http://localhost:8888/oauth/gp/googleplus-user1,googleplus-user2
+
+DELETE:
+
+$ curl -X DELETE http://localhost:8888/oauth/tw/twitter-user1,twitter-user2
+
+$ curl -X DELETE http://localhost:8888/oauth/fb/facebook-user1,facebook-user2
+
+$ curl -X DELETE http://localhost:8888/oauth/gp/googleplus-user1,googleplus-user2
