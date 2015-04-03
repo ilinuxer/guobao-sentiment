@@ -62,6 +62,7 @@ public class MonitorUserGplus {
                     Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory).build();
             Credential credential = flow.loadCredential("user");
             credential.refreshToken();
+            credential.getAccessToken();
             plus = new Plus.Builder(httpTransport,JSON_FACTORY,credential).setApplicationName(appName).build();
             Plus.People.Search peopleSearch = plus.people().search(name);
             peopleSearch.setMaxResults(50L);

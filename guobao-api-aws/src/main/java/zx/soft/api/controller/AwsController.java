@@ -67,7 +67,7 @@ public class AwsController {
                 //添加gplus用户
                 List<Person> people = monitorGplus.createFriendship(userName);
                 if (people == null | people.size() == 0) {
-                    return "-1";
+                    result = "0";
                 } else if (people.size() == 1) {
                     Person person = people.get(0);
                     //插入数据库
@@ -92,7 +92,7 @@ public class AwsController {
                 }
             } else if ("fb".equals(sns)) {
                 //添加facebook用户
-                return "未实现该功能";
+                return "undo";
             }
         } catch (Exception e) {
             logger.error("Exception:{}", LogbackUtil.expection2Str(e));
