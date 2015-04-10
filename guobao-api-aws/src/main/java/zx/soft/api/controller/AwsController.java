@@ -11,6 +11,7 @@ import zx.soft.api.adduser.common.MybatisConfig;
 import zx.soft.api.adduser.common.PostUrlConfig;
 import zx.soft.api.adduser.dao.server.MonitorUserDaoServer;
 import zx.soft.api.adduser.gplus.MonitorUserGplus;
+import zx.soft.api.adduser.post.HttpClientPost;
 import zx.soft.api.adduser.post.RestletPost;
 import zx.soft.api.adduser.twitter.MonitorUserTwitter;
 import zx.soft.api.domain.ErrorResponse;
@@ -51,12 +52,13 @@ public class AwsController {
         if (user == null) {
             return "-1";
         }
-        //"-1"--查找错误;"0"--未查到用户
+        //"-1"--查找错误或者用户信息插入数据库失败;"0"--未查到用户
         String result = "0";
 
         String sns = user.getSns();
         String userName = user.getName();
         String url = user.getUid();
+        logger.info(sns+"::"+userName+"::"+url);
         try {
             if ("tw".equals(sns)) {
                 //添加twitter用户
@@ -86,6 +88,8 @@ public class AwsController {
                             insertIntoGplusUserDB(person);
                             result = person.getId();
                             break;
+                        }else{
+                            result="0";
                         }
                     }
 
@@ -129,9 +133,7 @@ public class AwsController {
     }
 
     private GplusUserInfos getGplusUserInfos(Person person){
-        return new GplusUserInfos(person.getDisplayName(), person.getEtag(),
-                person.getId(), person.getImage().getUrl(), person.getKind(),
-                person.getObjectType(),person.getUrl());
+        return new GplusUserInfos(person.getDisplayName(),person.getId(),person.getImage().getUrl(),person.getUrl());
     }
 
     private TwitterUserInfos getTwitterUserInfos(User person){
@@ -145,18 +147,22 @@ public class AwsController {
 
     private void insertIntoGplusUserDB(Person person){
         GplusUserInfos personInfo = getGplusUserInfos(person);
-        daoServer.addGplusListern(person.getId(),person.getDisplayName());
-        daoServer.addGplusUserInfo(personInfo);
+        logger.info("POST用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.gplus.url");
-        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+        HttpClientPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+        daoServer.addGplusListern(person.getId(), person.getDisplayName());
+        daoServer.addGplusUserInfo(personInfo);
+//        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
     }
 
     private void insertIntoTwitterUserInfos(User person){
 
         TwitterUserInfos personInfo = getTwitterUserInfos(person);
-        daoServer.addTwitterUserInfo(personInfo);
+        logger.info("POST用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.twitter.url");
-        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+        HttpClientPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+        daoServer.addTwitterUserInfo(personInfo);
+//        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
     }
 
     private String getPostUrl(String urlName){

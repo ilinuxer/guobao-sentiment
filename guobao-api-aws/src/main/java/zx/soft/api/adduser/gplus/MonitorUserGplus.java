@@ -52,7 +52,7 @@ public class MonitorUserGplus {
         String clientId = app.getClientId();
         String clientSecret = app.getClientSecret();
         //认证信息存储地址
-        File credentialsDir = new File(System.getProperty("user.home"),".gplus/credentials_"+appName);
+        File credentialsDir = new File(System.getProperty("user.home"),".gplus/"+appName);
 
         //根据用户名来获取用户基本数据
         //返回值为用户基本信息列表

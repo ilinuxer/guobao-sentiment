@@ -53,7 +53,7 @@ public interface MonitorUserMapper {
     /**
      * 添加Gplus用户基本信息到数据库
      */
-    @Insert("INSERT INTO `gplusUserDetailInfo` (`userId`,`displayName`,`etage`,`imageUrl`,`kind`,`objectType`,`url`,`lastTime`) VALUES (#{userId},#{displayName},#{etage},#{imageUrl},#{kind},#{objectType},#{url},NOW())")
+    @Insert("INSERT INTO `user_info_googleplus` (`id`,`display_name`,`name`,`url`,`image_url`,`lastTime`) VALUES (#{userId},#{displayName},#{displayName},#{url},#{imageUrl},NOW())")
     public void addGplusUserInfo(GplusUserInfos gplusUserInfos);
 
     /**

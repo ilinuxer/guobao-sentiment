@@ -107,7 +107,14 @@
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 		</dependency>
-		<!-- Restlet组件 -->
+        <!-- HttpClient 组建-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.5</version>
+        </dependency>
+
+        <!-- Restlet组件 -->
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet</artifactId>
@@ -115,14 +122,6 @@
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet.example</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet.ext.simple</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet.ext.xml</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.restlet.jse</groupId>

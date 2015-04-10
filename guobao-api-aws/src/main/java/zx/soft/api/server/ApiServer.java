@@ -63,5 +63,4 @@ public class ApiServer {
 		contextHandler.setResourceBase(new ClassPathResource("webapp").getURI().toString());
 		return contextHandler;
 	}
-
 }

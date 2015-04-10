@@ -91,6 +91,7 @@ public class MonitorUserDaoServer {
     public void addGplusUserInfo(GplusUserInfos gplusUserInfos){
         try(SqlSession sqlSession = sqlSessionFactory.openSession()){
             MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
+            logger.info("开始插入用户信息详情");
             monitor.addGplusUserInfo(gplusUserInfos);
         }
     }
