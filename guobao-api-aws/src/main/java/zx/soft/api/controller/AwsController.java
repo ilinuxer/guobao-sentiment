@@ -1,6 +1,7 @@
 package zx.soft.api.controller;
 
 import com.google.api.services.plus.model.Person;
+import com.jimbo.json.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,6 @@ import zx.soft.api.url.UrlResources;
 import zx.soft.model.aws.SimpleUser;
 import zx.soft.model.aws.SnapShot;
 import zx.soft.utils.checksum.CheckSumUtils;
-import zx.soft.utils.json.JsonUtils;
 import zx.soft.utils.log.LogbackUtil;
 import zx.soft.utils.time.TimeUtils;
 
@@ -62,9 +62,20 @@ public class AwsController {
         try {
             if ("tw".equals(sns)) {
                 //添加twitter用户
-                User person = monitorTwitter.createFriendship(userName);
-                insertIntoTwitterUserInfos(person);
-                result = person.getId() + "";
+                try{
+                    User person = monitorTwitter.createFriendship(userName);
+                    logger.info(JsonUtils.toJson(person));
+                    if(person != null ){
+                        insertIntoTwitterUserInfos(person);
+                        result = person.getId() + "";
+                    }else {
+                        result = "0";
+                    }
+                }catch (Exception e){
+                    result = "0";
+                }
+
+
             } else if ("gp".equals(sns)) {
                 //添加gplus用户
                 List<Person> people = monitorGplus.createFriendship(userName);
@@ -73,20 +84,33 @@ public class AwsController {
                 } else if (people.size() == 1) {
                     Person person = people.get(0);
                     //插入数据库
-                    insertIntoGplusUserDB(person);
-                    result = person.getId();
+                    String insertResult = insertIntoGplusUserDB(person);
+                    if(insertResult == "0"){
+                        result = person.getId();
+                    }else {
+                        result = "-1";
+                    }
+
                 } else {
                     String lowUserName = userName.replaceAll("\\s", "").replaceAll("\\(", "").replaceAll("\\)","").toLowerCase();
                     for (Person person : people) {
                         String id = person.getId();
                         if (person.getUrl().contains(lowUserName)) {
-                            insertIntoGplusUserDB(person);
-                            result = person.getId();
+                            String insertResult = insertIntoGplusUserDB(person);
+                            if(insertResult == "0"){
+                                result = person.getId();
+                            }else {
+                                result = "-1";
+                            }
                             break;
                         }
                         if (url.contains(id)) {
-                            insertIntoGplusUserDB(person);
-                            result = person.getId();
+                            String insertResult = insertIntoGplusUserDB(person);
+                            if(insertResult == "0"){
+                                result = person.getId();
+                            }else {
+                                result = "-1";
+                            }
                             break;
                         }else{
                             result="0";
@@ -137,7 +161,6 @@ public class AwsController {
     }
 
     private TwitterUserInfos getTwitterUserInfos(User person){
-        System.out.println(JsonUtils.toJson(person));
         return new TwitterUserInfos(person.getId(),person.getName(),
                 person.getScreenName(),person.getProfileImageURL(), TimeUtils.transStrToCommonDateStr(person.getCreatedAt().toString()),
                 person.getLocation(),person.getURL(),person.getFavouritesCount(),person.getUtcOffset(),
@@ -145,14 +168,19 @@ public class AwsController {
                 person.isVerified(),person.getTimeZone(),person.getStatusesCount(),person.getFriendsCount());
     }
 
-    private void insertIntoGplusUserDB(Person person){
+    private String insertIntoGplusUserDB(Person person){
         GplusUserInfos personInfo = getGplusUserInfos(person);
         logger.info("POST用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.gplus.url");
-        HttpClientPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+        String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
+//        String result = RestletPost.postData(url,JsonUtils.toJson(personInfo));
+        System.out.println("post result :" + result);
+        if(result == "-1"){
+            return "-1";
+        }
         daoServer.addGplusListern(person.getId(), person.getDisplayName());
         daoServer.addGplusUserInfo(personInfo);
-//        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+        return "0";
     }
 
     private void insertIntoTwitterUserInfos(User person){
@@ -160,9 +188,10 @@ public class AwsController {
         TwitterUserInfos personInfo = getTwitterUserInfos(person);
         logger.info("POST用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.twitter.url");
-        HttpClientPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
+//        HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
+        String result = RestletPost.postData(url,JsonUtils.toJson(personInfo));
+        System.out.println("post result :" + result);
         daoServer.addTwitterUserInfo(personInfo);
-//        RestletPost.postData(url,JsonUtils.toJsonWithoutPretty(personInfo));
     }
 
     private String getPostUrl(String urlName){

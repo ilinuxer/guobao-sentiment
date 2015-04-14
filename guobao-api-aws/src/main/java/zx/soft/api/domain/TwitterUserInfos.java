@@ -1,9 +1,12 @@
 package zx.soft.api.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by jimbo on 15-4-2.
  */
-public class TwitterUserInfos {
+public class TwitterUserInfos implements Serializable {
+
     private long id;
     private String name;
     private String screenName;

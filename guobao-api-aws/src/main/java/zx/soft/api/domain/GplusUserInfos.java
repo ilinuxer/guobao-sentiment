@@ -1,9 +1,11 @@
 package zx.soft.api.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by jimbo on 15-4-1.
  */
-public class GplusUserInfos {
+public class GplusUserInfos implements Serializable {
     private String displayName;
     private String userId;
     private String imageUrl;

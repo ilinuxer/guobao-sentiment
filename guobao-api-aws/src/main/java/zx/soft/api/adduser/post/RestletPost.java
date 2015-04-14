@@ -22,6 +22,7 @@ public class RestletPost {
      * 将data Post到指定的Url
      */
     public static String postData(String url,String data){
+
         String result = "";
         ClientResource requsetResource = new ClientResource(url);
         Representation entity = new StringRepresentation(data);
@@ -29,6 +30,7 @@ public class RestletPost {
         Representation response = requsetResource.post(entity);
         try{
             result = response.getText();
+            logger.info("post inner result :: " + result);
             if(result.charAt(13) != 0){
                 return "-1";
             }
