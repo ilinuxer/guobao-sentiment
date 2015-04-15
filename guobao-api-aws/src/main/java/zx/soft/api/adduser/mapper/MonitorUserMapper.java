@@ -53,7 +53,7 @@ public interface MonitorUserMapper {
     /**
      * 添加Gplus用户基本信息到数据库
      */
-    @Insert("INSERT INTO `user_info_googleplus` (`id`,`display_name`,`name`,`url`,`image_url`,`lastTime`) VALUES (#{userId},#{displayName},#{displayName},#{url},#{imageUrl},NOW())")
+    @Insert("INSERT INTO `user_info_googleplus` (`id`,`display_name`,`name`,`url`,`image_url`,`lastTime`) VALUES (#{id},#{display_name},#{display_name},#{url},#{image_url},NOW())")
     public void addGplusUserInfo(GplusUserInfos gplusUserInfos);
 
     /**
@@ -62,9 +62,9 @@ public interface MonitorUserMapper {
     @Insert("INSERT INTO `user_info_twitter` (`id`,`name`,`screen_name`,`profile_image_url`," +
             "`created_at`,`location`,`url`,`favourites_count`,`utc_offset`,`listed_count`,`followers_count`," +
             "`lang`,`description`,`verified`,`time_zone`,`statuses_count`, `friends_count`,`lasttime`) "+
-            "VALUES (#{id},#{name},#{screenName},#{profileImageUrl},#{createdAt},#{location},#{url}," +
-            "#{favouritesCount},#{utcOffset},#{listedCount},#{followersCount},#{lang},#{description}," +
-            "#{verified},#{timeZone},#{statusesCount},#{friendsCount},NOW())")
+            "VALUES (#{id},#{name},#{screen_name},#{profile_image_url},#{created_at},#{location},#{url}," +
+            "#{favourites_count},#{utc_offset},#{listed_count},#{followers_count},#{lang},#{description}," +
+            "#{verified},#{time_zone},#{statuses_count},#{friends_count},NOW())")
     public void addTwitterUserInfo(TwitterUserInfos twitterUserInfos);
 
 }

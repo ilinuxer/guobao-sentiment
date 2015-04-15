@@ -6,33 +6,39 @@ import java.io.Serializable;
  * Created by jimbo on 15-4-1.
  */
 public class GplusUserInfos implements Serializable {
-    private String displayName;
-    private String userId;
-    private String imageUrl;
+    private String id;
+    private String display_name;
+    private String name;
     private String url;
+    private String image_url;
 
-    public String getDisplayName() {
-        return displayName;
+    public GplusUserInfos() {
+
+        //
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public String getId() {
+        return id;
     }
 
-    public String getUserId() {
-        return userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getDisplay_name() {
+        return display_name;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public void setDisplay_name(String display_name) {
+        this.display_name = display_name;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUrl() {
@@ -43,14 +49,22 @@ public class GplusUserInfos implements Serializable {
         this.url = url;
     }
 
-    public GplusUserInfos() {
-        //
+    public String getImage_url() {
+        return image_url;
     }
 
-    public GplusUserInfos(String displayName, String userId, String imageUrl, String url) {
-        this.displayName = displayName;
-        this.userId = userId;
-        this.imageUrl = imageUrl;
-        this.url = url;
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
+
+    public GplusUserInfos(String id, String display_name, String name, String url, String image_url) {
+        this.id = id;
+        this.display_name = display_name;
+        this.name = name;
+        this.url = url;
+        this.image_url = image_url;
+    }
+
+
+
 }

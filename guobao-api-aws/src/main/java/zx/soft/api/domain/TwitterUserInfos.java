@@ -9,24 +9,44 @@ public class TwitterUserInfos implements Serializable {
 
     private long id;
     private String name;
-    private String screenName;
-    private String profileImageUrl;
-    private String createdAt;
+    private String screen_name;
+    private String profile_image_url;
+    private String created_at;
     private String location;
     private String url;
-    private int favouritesCount;
-    private int utcOffset;
-    private int listedCount;
-    private int followersCount;
+    private int favourites_count;
+    private int utc_offset;
+    private int listed_count;
+    private int followers_count;
     private String lang;
     private String description;
     private boolean verified;
-    private String timeZone;
-    private int statusesCount;
-    private int friendsCount;
+    private String time_zone;
+    private int statuses_count;
+    private int friends_count;
 
     public TwitterUserInfos() {
         //
+    }
+
+    public TwitterUserInfos(long id, String name, String screen_name, String profile_image_url, String created_at, String location, String url, int favourites_count, int utc_offset, int listed_count, int followers_count, String lang, String description, boolean verified, String time_zone, int statuses_count, int friends_count) {
+        this.id = id;
+        this.name = name;
+        this.screen_name = screen_name;
+        this.profile_image_url = profile_image_url;
+        this.created_at = created_at;
+        this.location = location;
+        this.url = url;
+        this.favourites_count = favourites_count;
+        this.utc_offset = utc_offset;
+        this.listed_count = listed_count;
+        this.followers_count = followers_count;
+        this.lang = lang;
+        this.description = description;
+        this.verified = verified;
+        this.time_zone = time_zone;
+        this.statuses_count = statuses_count;
+        this.friends_count = friends_count;
     }
 
     public long getId() {
@@ -45,28 +65,28 @@ public class TwitterUserInfos implements Serializable {
         this.name = name;
     }
 
-    public String getScreenName() {
-        return screenName;
+    public String getScreen_name() {
+        return screen_name;
     }
 
-    public void setScreenName(String screenName) {
-        this.screenName = screenName;
+    public void setScreen_name(String screen_name) {
+        this.screen_name = screen_name;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
+    public String getProfile_image_url() {
+        return profile_image_url;
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+    public void setProfile_image_url(String profile_image_url) {
+        this.profile_image_url = profile_image_url;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getCreated_at() {
+        return created_at;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
     }
 
     public String getLocation() {
@@ -85,36 +105,36 @@ public class TwitterUserInfos implements Serializable {
         this.url = url;
     }
 
-    public int getFavouritesCount() {
-        return favouritesCount;
+    public int getFavourites_count() {
+        return favourites_count;
     }
 
-    public void setFavouritesCount(int favouritesCount) {
-        this.favouritesCount = favouritesCount;
+    public void setFavourites_count(int favourites_count) {
+        this.favourites_count = favourites_count;
     }
 
-    public int getUtcOffset() {
-        return utcOffset;
+    public int getUtc_offset() {
+        return utc_offset;
     }
 
-    public void setUtcOffset(int utcOffset) {
-        this.utcOffset = utcOffset;
+    public void setUtc_offset(int utc_offse) {
+        this.utc_offset = utc_offse;
     }
 
-    public int getListedCount() {
-        return listedCount;
+    public int getListed_count() {
+        return listed_count;
     }
 
-    public void setListedCount(int listedCount) {
-        this.listedCount = listedCount;
+    public void setListed_count(int listed_count) {
+        this.listed_count = listed_count;
     }
 
-    public int getFollowersCount() {
-        return followersCount;
+    public int getFollowers_count() {
+        return followers_count;
     }
 
-    public void setFollowersCount(int followersCount) {
-        this.followersCount = followersCount;
+    public void setFollowers_count(int followers_count) {
+        this.followers_count = followers_count;
     }
 
     public String getLang() {
@@ -141,48 +161,27 @@ public class TwitterUserInfos implements Serializable {
         this.verified = verified;
     }
 
-    public String getTimeZone() {
-        return timeZone;
+    public String getTime_zone() {
+        return time_zone;
     }
 
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
+    public void setTime_zone(String time_zone) {
+        this.time_zone = time_zone;
     }
 
-    public int getStatusesCount() {
-        return statusesCount;
+    public int getStatuses_count() {
+        return statuses_count;
     }
 
-    public void setStatusesCount(int statusesCount) {
-        this.statusesCount = statusesCount;
+    public void setStatuses_count(int statuses_count) {
+        this.statuses_count = statuses_count;
     }
 
-    public int getFriendsCount() {
-        return friendsCount;
+    public int getFriends_count() {
+        return friends_count;
     }
 
-    public void setFriendsCount(int friendsCount) {
-        this.friendsCount = friendsCount;
-    }
-
-    public TwitterUserInfos(long id, String name, String screenName, String profileImageUrl, String createdAt, String location, String url, int favouritesCount, int utcOffset, int listedCount, int followersCount, String lang, String description, boolean verified, String timeZone, int statusesCount, int friendsCount) {
-
-        this.id = id;
-        this.name = name;
-        this.screenName = screenName;
-        this.profileImageUrl = profileImageUrl;
-        this.createdAt = createdAt;
-        this.location = location;
-        this.url = url;
-        this.favouritesCount = favouritesCount;
-        this.utcOffset = utcOffset;
-        this.listedCount = listedCount;
-        this.followersCount = followersCount;
-        this.lang = lang;
-        this.description = description;
-        this.verified = verified;
-        this.timeZone = timeZone;
-        this.statusesCount = statusesCount;
-        this.friendsCount = friendsCount;
+    public void setFriends_count(int friends_count) {
+        this.friends_count = friends_count;
     }
 }

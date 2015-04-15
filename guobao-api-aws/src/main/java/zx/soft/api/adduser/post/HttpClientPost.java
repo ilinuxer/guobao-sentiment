@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 import zx.soft.utils.json.JsonUtils;
 import zx.soft.utils.log.LogbackUtil;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by jimbo on 15-4-10.
  * post数据到指定接口
@@ -19,20 +23,21 @@ public class HttpClientPost {
     private static Logger logger = LoggerFactory.getLogger(HttpClientPost.class);
 
     public static String postData(String url,String data){
-        String result = "";
+
+        String result = "0";
+        String ldata = "[" +data + "]";
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
         try {
-            StringEntity params = new StringEntity(data);
+            StringEntity params = new StringEntity(ldata);
+
             request.setHeader("content-type", "application/json");
             request.setEntity(params);
             logger.info("post 用户详细信息");
             HttpResponse response = httpClient.execute(request);
-            logger.info("Response Code : "
-                    + response.getStatusLine().getStatusCode());
+            logger.info("Response Code : " + response.getStatusLine().getStatusCode());
 
         } catch (Exception e) {
-            logger.info("post inner inner exception ");
             logger.error("Exception:{}", LogbackUtil.expection2Str(e));
             result = "-1";
         }

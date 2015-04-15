@@ -1,5 +1,8 @@
 package zx.soft.api.adduser.twitter;
 
+import com.jimbo.math.RandomNum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -17,6 +20,7 @@ import java.util.Properties;
  * Created by jimbo on 15-3-31.
  */
 public class MonitorUserTwitter {
+    private static Logger logger = LoggerFactory.getLogger(MonitorUserTwitter.class);
     private static MonitorUserDaoServer server;
 
     public MonitorUserTwitter() {
@@ -26,7 +30,7 @@ public class MonitorUserTwitter {
     public User createFriendship(String name){
 
         List<TwitterToken> tokens = getTokens();
-        TwitterToken token = tokens.get(tokens.size()-1);
+        TwitterToken token = tokens.get(RandomNum.integerRandom(-1, tokens.size()));
         Properties properties = TwitterAppConfig.getProp("twitter-apps.properties");
         String consumerKey = properties.getProperty("consumer.key");
         String consumerSecret = properties.getProperty("consumer.secret");

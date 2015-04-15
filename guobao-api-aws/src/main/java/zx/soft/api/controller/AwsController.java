@@ -41,7 +41,6 @@ public class AwsController {
 
     private MonitorUserGplus monitorGplus = new MonitorUserGplus();
     private MonitorUserTwitter monitorTwitter = new MonitorUserTwitter();
-
     private MonitorUserDaoServer daoServer = new MonitorUserDaoServer(MybatisConfig.Servers.GBXM);
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
@@ -54,31 +53,38 @@ public class AwsController {
         }
         //"-1"--查找错误或者用户信息插入数据库失败;"0"--未查到用户
         String result = "0";
-
         String sns = user.getSns();
         String userName = user.getName();
         String url = user.getUid();
-        logger.info(sns+"::"+userName+"::"+url);
         try {
             if ("tw".equals(sns)) {
                 //添加twitter用户
                 try{
                     User person = monitorTwitter.createFriendship(userName);
-                    logger.info(JsonUtils.toJson(person));
+                    logger.info("添加关注 ： id:" + person.getId() +"  name:" +userName);
                     if(person != null ){
-                        insertIntoTwitterUserInfos(person);
-                        result = person.getId() + "";
-                    }else {
+                        String result1 = insertIntoTwitterUserInfos(person);
+                        if(result1 == "0"){
+                            result = person.getId() + "";
+                        }else if(result1 == "-1"){
+                            result = "-1";
+                        }else {
+                            result = "0";
+                        }
+
+                    }else if(person == null){
                         result = "0";
                     }
                 }catch (Exception e){
-                    result = "0";
+                    logger.error("Exception{}:" + LogbackUtil.expection2Str(e));
+                    result = "-1";
                 }
 
 
             } else if ("gp".equals(sns)) {
                 //添加gplus用户
                 List<Person> people = monitorGplus.createFriendship(userName);
+                logger.info("people size is :" + people.size());
                 if (people == null | people.size() == 0) {
                     result = "0";
                 } else if (people.size() == 1) {
@@ -157,7 +163,7 @@ public class AwsController {
     }
 
     private GplusUserInfos getGplusUserInfos(Person person){
-        return new GplusUserInfos(person.getDisplayName(),person.getId(),person.getImage().getUrl(),person.getUrl());
+        return new GplusUserInfos(person.getId(),person.getDisplayName(),person.getDisplayName(),person.getUrl(),person.getImage().getUrl());
     }
 
     private TwitterUserInfos getTwitterUserInfos(User person){
@@ -170,11 +176,12 @@ public class AwsController {
 
     private String insertIntoGplusUserDB(Person person){
         GplusUserInfos personInfo = getGplusUserInfos(person);
-        logger.info("POST用户详细信息到solr接口并插入用户信息详情表！！");
+        logger.info("POST google+ 用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.gplus.url");
+
         String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
-//        String result = RestletPost.postData(url,JsonUtils.toJson(personInfo));
-        System.out.println("post result :" + result);
+        logger.info("post gplus result is :" + result);
+
         if(result == "-1"){
             return "-1";
         }
@@ -183,15 +190,19 @@ public class AwsController {
         return "0";
     }
 
-    private void insertIntoTwitterUserInfos(User person){
+    private String insertIntoTwitterUserInfos(User person){
 
         TwitterUserInfos personInfo = getTwitterUserInfos(person);
-        logger.info("POST用户详细信息到solr接口并插入用户信息详情表！！");
+        logger.info("POST Twitter 用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.twitter.url");
-//        HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
-        String result = RestletPost.postData(url,JsonUtils.toJson(personInfo));
+        String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
+//        String result = RestletPost.postData(url,JsonUtils.toJson(personInfo));
         System.out.println("post result :" + result);
+        if(result == "-1"){
+            return "-1";
+        }
         daoServer.addTwitterUserInfo(personInfo);
+        return "0";
     }
 
     private String getPostUrl(String urlName){
