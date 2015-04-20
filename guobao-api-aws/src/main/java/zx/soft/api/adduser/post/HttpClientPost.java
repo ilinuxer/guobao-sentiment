@@ -2,18 +2,13 @@ package zx.soft.api.adduser.post;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import zx.soft.utils.json.JsonUtils;
 import zx.soft.utils.log.LogbackUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by jimbo on 15-4-10.
@@ -22,10 +17,10 @@ import java.util.List;
 public class HttpClientPost {
     private static Logger logger = LoggerFactory.getLogger(HttpClientPost.class);
 
-    public static String postData(String url,String data){
+    public static String postData(String url, String data) {
 
         String result = "0";
-        String ldata = "[" +data + "]";
+        String ldata = "[" + data + "]";
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
         try {

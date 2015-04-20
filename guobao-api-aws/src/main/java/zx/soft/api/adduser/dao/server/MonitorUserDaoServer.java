@@ -104,4 +104,36 @@ public class MonitorUserDaoServer {
             monitor.addTwitterUserInfo(twitterUserInfos);
         }
     }
+
+    /**
+     * 删除监控用户列表中gplus用户信息
+     */
+    public void delGplusMonitorInfo(String id){
+        try(SqlSession sqlSession = sqlSessionFactory.openSession()){
+            MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
+            monitor.delGplusMonitorInfo(id);
+        }
+    }
+
+    /**
+     * 删除gplus用户相信信息列表中的用户信息
+     */
+    public void delGplusUserInfo(String id){
+        try(SqlSession sqlSession = sqlSessionFactory.openSession()){
+            MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
+            monitor.delGplusUserInfo(id);
+        }
+    }
+
+    /**
+     * 删除Twitter 用户详细信息列表中的指定用户
+     */
+    public void delTwUserInfo(String id){
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()){
+            MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
+            monitor.delTwUserInfo(id);
+        }
+    }
+
+
 }

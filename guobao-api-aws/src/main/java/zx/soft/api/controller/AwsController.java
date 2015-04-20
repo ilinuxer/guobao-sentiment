@@ -13,10 +13,10 @@ import zx.soft.api.adduser.common.PostUrlConfig;
 import zx.soft.api.adduser.dao.server.MonitorUserDaoServer;
 import zx.soft.api.adduser.gplus.MonitorUserGplus;
 import zx.soft.api.adduser.post.HttpClientPost;
-import zx.soft.api.adduser.post.RestletPost;
 import zx.soft.api.adduser.twitter.MonitorUserTwitter;
 import zx.soft.api.domain.ErrorResponse;
 import zx.soft.api.domain.GplusUserInfos;
+import zx.soft.api.domain.PostResponse;
 import zx.soft.api.domain.TwitterUserInfos;
 import zx.soft.api.service.AwsService;
 import zx.soft.api.url.UrlResources;
@@ -27,6 +27,7 @@ import zx.soft.utils.log.LogbackUtil;
 import zx.soft.utils.time.TimeUtils;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -59,23 +60,23 @@ public class AwsController {
         try {
             if ("tw".equals(sns)) {
                 //添加twitter用户
-                try{
+                try {
                     User person = monitorTwitter.createFriendship(userName);
-                    logger.info("添加关注 ： id:" + person.getId() +"  name:" +userName);
-                    if(person != null ){
+                    logger.info("添加关注 ： id:" + person.getId() + "  name:" + userName);
+                    if (person != null) {
                         String result1 = insertIntoTwitterUserInfos(person);
-                        if(result1 == "0"){
+                        if (result1 == "0") {
                             result = person.getId() + "";
-                        }else if(result1 == "-1"){
+                        } else if (result1 == "-1") {
                             result = "-1";
-                        }else {
+                        } else {
                             result = "0";
                         }
 
-                    }else if(person == null){
+                    } else if (person == null) {
                         result = "0";
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     logger.error("Exception{}:" + LogbackUtil.expection2Str(e));
                     result = "-1";
                 }
@@ -91,35 +92,35 @@ public class AwsController {
                     Person person = people.get(0);
                     //插入数据库
                     String insertResult = insertIntoGplusUserDB(person);
-                    if(insertResult == "0"){
+                    if (insertResult == "0") {
                         result = person.getId();
-                    }else {
+                    } else {
                         result = "-1";
                     }
 
                 } else {
-                    String lowUserName = userName.replaceAll("\\s", "").replaceAll("\\(", "").replaceAll("\\)","").toLowerCase();
+                    String lowUserName = userName.replaceAll("\\s", "").replaceAll("\\(", "").replaceAll("\\)", "").toLowerCase();
                     for (Person person : people) {
                         String id = person.getId();
                         if (person.getUrl().contains(lowUserName)) {
                             String insertResult = insertIntoGplusUserDB(person);
-                            if(insertResult == "0"){
+                            if (insertResult == "0") {
                                 result = person.getId();
-                            }else {
+                            } else {
                                 result = "-1";
                             }
                             break;
                         }
                         if (url.contains(id)) {
                             String insertResult = insertIntoGplusUserDB(person);
-                            if(insertResult == "0"){
+                            if (insertResult == "0") {
                                 result = person.getId();
-                            }else {
+                            } else {
                                 result = "-1";
                             }
                             break;
-                        }else{
-                            result="0";
+                        } else {
+                            result = "0";
                         }
                     }
 
@@ -162,19 +163,78 @@ public class AwsController {
 
     }
 
-    private GplusUserInfos getGplusUserInfos(Person person){
-        return new GplusUserInfos(person.getId(),person.getDisplayName(),person.getDisplayName(),person.getUrl(),person.getImage().getUrl());
+
+    /**
+     * 删除gplus重点关注人员
+     *
+     * @param ids 用户id列表
+     * @return
+     */
+    @RequestMapping(value = "/gpdel", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    @ResponseBody
+    Object deleteGpUsers(@RequestBody List<String> ids) {
+        List<String> unSuccess = new ArrayList<>();
+
+        if (ids == null) {
+            return new ErrorResponse.Builder(-1, "has no ids");
+        }
+        for (String id : ids) {
+            try {
+                logger.info("Delete Gp Monitor user : {}", id);
+                deleteGplusUser(id);
+            } catch (Exception e) {
+                logger.error("Exception:{}", LogbackUtil.expection2Str(e));
+                unSuccess.add(id);
+            }
+        }
+        if (unSuccess.size() > 0) {
+            return new PostResponse(-1, unSuccess);
+        } else {
+            return new PostResponse(0, null);
+        }
     }
 
-    private TwitterUserInfos getTwitterUserInfos(User person){
-        return new TwitterUserInfos(person.getId(),person.getName(),
-                person.getScreenName(),person.getProfileImageURL(), TimeUtils.transStrToCommonDateStr(person.getCreatedAt().toString()),
-                person.getLocation(),person.getURL(),person.getFavouritesCount(),person.getUtcOffset(),
-                person.getListedCount(),person.getFollowersCount(),person.getLang(),person.getDescription(),
-                person.isVerified(),person.getTimeZone(),person.getStatusesCount(),person.getFriendsCount());
+    @RequestMapping(value = "/twdel", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    @ResponseBody
+    Object deleteTwUsers(@RequestBody List<String> ids) {
+        List<String> unSuccess = new ArrayList<>();
+
+        if (ids == null) {
+            return new ErrorResponse.Builder(-1, "has no ids");
+        }
+        for (String id : ids) {
+            try {
+                logger.info("Delete Tw Monitor user : {}", id);
+                deleteTwUser(id);
+            } catch (Exception e) {
+                logger.error("Exception:{}", LogbackUtil.expection2Str(e));
+                unSuccess.add(id);
+            }
+        }
+        if (unSuccess.size() > 0) {
+            return new PostResponse(-1, unSuccess);
+        } else {
+            return new PostResponse(0, null);
+        }
     }
 
-    private String insertIntoGplusUserDB(Person person){
+    private GplusUserInfos getGplusUserInfos(Person person) {
+        return new GplusUserInfos(person.getId(), person.getDisplayName(), person.getDisplayName(), person.getUrl(), person.getImage().getUrl());
+    }
+
+    private TwitterUserInfos getTwitterUserInfos(User person) {
+        return new TwitterUserInfos(person.getId(), person.getName(),
+                person.getScreenName(), person.getProfileImageURL(), TimeUtils.transStrToCommonDateStr(person.getCreatedAt().toString()),
+                person.getLocation(), person.getURL(), person.getFavouritesCount(), person.getUtcOffset(),
+                person.getListedCount(), person.getFollowersCount(), person.getLang(), person.getDescription(),
+                person.isVerified(), person.getTimeZone(), person.getStatusesCount(), person.getFriendsCount());
+    }
+
+    private String insertIntoGplusUserDB(Person person) {
         GplusUserInfos personInfo = getGplusUserInfos(person);
         logger.info("POST google+ 用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.gplus.url");
@@ -182,7 +242,7 @@ public class AwsController {
         String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
         logger.info("post gplus result is :" + result);
 
-        if(result == "-1"){
+        if (result == "-1") {
             return "-1";
         }
         daoServer.addGplusListern(person.getId(), person.getDisplayName());
@@ -190,7 +250,7 @@ public class AwsController {
         return "0";
     }
 
-    private String insertIntoTwitterUserInfos(User person){
+    private String insertIntoTwitterUserInfos(User person) {
 
         TwitterUserInfos personInfo = getTwitterUserInfos(person);
         logger.info("POST Twitter 用户详细信息到solr接口并插入用户信息详情表！！");
@@ -198,14 +258,29 @@ public class AwsController {
         String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
 //        String result = RestletPost.postData(url,JsonUtils.toJson(personInfo));
         System.out.println("post result :" + result);
-        if(result == "-1"){
+        if (result == "-1") {
             return "-1";
         }
         daoServer.addTwitterUserInfo(personInfo);
         return "0";
     }
 
-    private String getPostUrl(String urlName){
+    /**
+     * 数据库中删除gplus监控用户与用户详细信息
+     */
+    private void deleteGplusUser(String id) {
+        daoServer.delGplusMonitorInfo(id);
+        daoServer.delGplusUserInfo(id);
+    }
+
+    /**
+     * 解除Twitter好友关系，并从数据库删除该用户的详细信息
+     */
+    private void deleteTwUser(String id){
+        daoServer.delTwUserInfo(id);
+    }
+
+    private String getPostUrl(String urlName) {
         Properties properties = PostUrlConfig.getProp("posturls.properties");
         return properties.getProperty(urlName);
     }

@@ -39,7 +39,6 @@ public interface MonitorUserMapper {
     /**
      * 数据库获取Gplus应用列表
      */
-
     @Select("SELECT `app_name` AS appName,`client_id` AS clientId,`client_secret` AS clientSecret FROM `gplusApps`")
     public List<GplusApp> getGplusApps();
 
@@ -66,5 +65,24 @@ public interface MonitorUserMapper {
             "#{favourites_count},#{utc_offset},#{listed_count},#{followers_count},#{lang},#{description}," +
             "#{verified},#{time_zone},#{statuses_count},#{friends_count},NOW())")
     public void addTwitterUserInfo(TwitterUserInfos twitterUserInfos);
+
+    /**
+     * 删除google＋指定关注用户
+     */
+    @Delete("DELETE FROM `googleUserInfos` WHERE `userId` = #{0}")
+    public void delGplusMonitorInfo(String id);
+
+
+    /**
+     * 删除gplus用户相信信息列表中的用户信息
+     */
+    @Delete("DELETE FROM `user_info_googleplus` WHERE `id` = #{0}")
+    public void delGplusUserInfo(String id);
+
+    /**
+     * 删除Twitter用户详细信息列表中指定的用户
+     */
+    @Delete("DELETE FROM `user_info_twitter` WHERE `id` = #{0}")
+    public void delTwUserInfo(String id);
 
 }

@@ -4,3 +4,6 @@ $ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/aw
 
 POST快照地址：
 $ curl -X POST --header 'Content-Type:application/json' http://localhost:8888/aws/snapshot --data '["http://www.twitter.com","http://www.facebook.com","http://www.googleplus.com"]'
+
+POST删除用户
+$ curl -X POST --header 'Content-Type:application/json' http://localhost:8900/aws/gpdel --data '["123","124"]'
