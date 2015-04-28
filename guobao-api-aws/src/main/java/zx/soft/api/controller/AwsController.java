@@ -61,7 +61,6 @@ public class AwsController {
                 try {
 //                    User person = monitorTwitter.createFriendship(userName);
                     User person = monitorTwitter.showPerson(userName);
-//                    logger.info(JsonUtils.toJson(person));
                     logger.info("添加关注 ： id:" + person.getId() + "  name:" + userName);
                     if (person != null) {
                         String result1 = insertIntoTwitterUserInfos(person);
@@ -98,7 +97,6 @@ public class AwsController {
                     } else {
                         result = "-1";
                     }
-
                 } else {
                     String lowUserName = userName.replaceAll("\\s", "").replaceAll("\\(", "").replaceAll("\\)", "").toLowerCase();
                     for (Person person : people) {
@@ -137,6 +135,7 @@ public class AwsController {
         return result;
     }
 
+    //网页快照部分
 //    @RequestMapping(value = "/snapshot", method = RequestMethod.POST)
 //    @ResponseStatus(HttpStatus.CREATED)
 //    public
@@ -234,22 +233,27 @@ public class AwsController {
     }
 
     private String insertIntoGplusUserDB(Person person) {
+
         GplusUserInfos personInfo = getGplusUserInfos(person);
-        logger.info("POST google+ 用户详细信息到solr接口并插入用户信息详情表！！");
+        logger.info("POST google+ 用户 {} 详细信息到solr接口并插入用户信息详情表",person.getDisplayName());
         String url = getPostUrl("guobao.gplus.url");
 
         String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
-        logger.info("post gplus result is :" + result);
+        logger.info("post gplus user {} result is :" + result ,person.getDisplayName());
 
         if (result == "-1") {
             return "-1";
         }
-        //插入监控用户列表
-        daoServer.addGplusListern(person.getId(), person.getDisplayName());
-        //插入用户详细信息列表
-        daoServer.addGplusUserInfo(personInfo);
-        //插入新增用户信息列表
-        daoServer.insertCurrentUser(new CurrentUserInfo(person.getId(),person.getDisplayName(),"gp"));
+        try {
+            //插入监控用户列表      "googleUserInfos"
+            daoServer.addGplusListern(person.getId(), person.getDisplayName());
+            //插入用户详细信息列表    "user_info_googleplus"
+            daoServer.addGplusUserInfo(personInfo);
+            //插入新增用户信息列表    "current_user_info"
+            daoServer.insertCurrentUser(new CurrentUserInfo(person.getId(), person.getDisplayName(), "gp"));
+        }catch (Exception e ){
+            logger.error("Exception {}",e);
+        }
         return "0";
     }
 
@@ -259,7 +263,7 @@ public class AwsController {
     private String insertIntoTwitterUserInfos(User person) {
 
         TwitterUserInfos personInfo = getTwitterUserInfos(person);
-        logger.info("POST Twitter 用户详细信息到solr接口并插入用户信息详情表！！");
+        logger.info("POST Twitter 用户 {} 详细信息到solr接口并插入用户信息详情表",person.getScreenName());
         String url = getPostUrl("guobao.twitter.url");
         String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
         logger.info("post result :" + result);

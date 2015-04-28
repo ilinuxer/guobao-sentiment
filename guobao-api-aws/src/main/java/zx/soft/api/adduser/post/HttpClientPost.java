@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import zx.soft.utils.log.LogbackUtil;
 
 
+
 /**
  * Created by jimbo on 15-4-10.
  * post数据到指定接口
@@ -24,9 +25,9 @@ public class HttpClientPost {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
         try {
-            StringEntity params = new StringEntity(ldata);
+            StringEntity params = new StringEntity(ldata,"UTF-8");
 
-            request.setHeader("content-type", "application/json");
+            request.setHeader("content-type", "application/json;");
             request.setEntity(params);
             logger.info("post 用户详细信息");
             HttpResponse response = httpClient.execute(request);

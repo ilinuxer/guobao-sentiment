@@ -79,7 +79,4 @@ public class MonitorUserGplus {
     public List<GplusApp> getGplusApps(){
         return server.getGplusApps();
     }
-
-
-
 }

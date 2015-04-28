@@ -88,9 +88,9 @@ public class MonitorUserDaoServer {
      * 添加Gplus用户基本信息到数据库
      */
     public void addGplusUserInfo(GplusUserInfos gplusUserInfos){
+        logger.info("google+ user insert user information table");
         try(SqlSession sqlSession = sqlSessionFactory.openSession()){
             MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
-            logger.info("开始插入用户信息详情");
             monitor.addGplusUserInfo(gplusUserInfos);
         }
     }
