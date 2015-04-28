@@ -14,14 +14,12 @@ import zx.soft.api.adduser.dao.server.MonitorUserDaoServer;
 import zx.soft.api.adduser.gplus.MonitorUserGplus;
 import zx.soft.api.adduser.post.HttpClientPost;
 import zx.soft.api.adduser.twitter.MonitorUserTwitter;
-import zx.soft.api.domain.ErrorResponse;
-import zx.soft.api.domain.GplusUserInfos;
-import zx.soft.api.domain.PostResponse;
-import zx.soft.api.domain.TwitterUserInfos;
+import zx.soft.api.domain.*;
 import zx.soft.api.service.AwsService;
 import zx.soft.api.url.UrlResources;
 import zx.soft.model.aws.SimpleUser;
 import zx.soft.model.aws.SnapShot;
+import zx.soft.model.user.CurrentUserInfo;
 import zx.soft.utils.checksum.CheckSumUtils;
 import zx.soft.utils.log.LogbackUtil;
 import zx.soft.utils.time.TimeUtils;
@@ -52,7 +50,7 @@ public class AwsController {
         if (user == null) {
             return "-1";
         }
-        //"-1"--查找错误或者用户信息插入数据库失败;"0"--未查到用户
+        //"-1"--查找错误或者用户信息插入数据库失败;"0"--未查到用户;id 值表示插入成功
         String result = "0";
         String sns = user.getSns();
         String userName = user.getName();
@@ -61,10 +59,13 @@ public class AwsController {
             if ("tw".equals(sns)) {
                 //添加twitter用户
                 try {
-                    User person = monitorTwitter.createFriendship(userName);
+//                    User person = monitorTwitter.createFriendship(userName);
+                    User person = monitorTwitter.showPerson(userName);
+//                    logger.info(JsonUtils.toJson(person));
                     logger.info("添加关注 ： id:" + person.getId() + "  name:" + userName);
                     if (person != null) {
                         String result1 = insertIntoTwitterUserInfos(person);
+                        System.out.println(result1);
                         if (result1 == "0") {
                             result = person.getId() + "";
                         } else if (result1 == "-1") {
@@ -136,32 +137,32 @@ public class AwsController {
         return result;
     }
 
-    @RequestMapping(value = "/snapshot", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public
-    @ResponseBody
-    Object createUrls(@RequestBody List<String> urls) {
-        if (urls == null) {
-            return new ErrorResponse.Builder(-1, "has no urls");
-        }
-        String url = urls.get(0);
-        String html = "";
-        try {
-            html = awsService.selectSnapShotHtml(CheckSumUtils.getMD5(url));
-
-            if (html == null || html == "") {
-                html = UrlResources.getResource(url);
-                awsService.insertSnapShot(new SnapShot(CheckSumUtils.getMD5(url), url, "0"));
-                awsService.updateSnapShot(new SnapShot(CheckSumUtils.getMD5(url), url, html));
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception:{}", LogbackUtil.expection2Str(e));
-        }
-
-        return (html == "" || html == null) ? "0" : html;
-
-    }
+//    @RequestMapping(value = "/snapshot", method = RequestMethod.POST)
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public
+//    @ResponseBody
+//    Object createUrls(@RequestBody List<String> urls) {
+//        if (urls == null) {
+//            return new ErrorResponse.Builder(-1, "has no urls");
+//        }
+//        String url = urls.get(0);
+//        String html = "";
+//        try {
+//            html = awsService.selectSnapShotHtml(CheckSumUtils.getMD5(url));
+//
+//            if (html == null || html == "") {
+//                html = UrlResources.getResource(url);
+//                awsService.insertSnapShot(new SnapShot(CheckSumUtils.getMD5(url), url, "0"));
+//                awsService.updateSnapShot(new SnapShot(CheckSumUtils.getMD5(url), url, html));
+//            }
+//
+//        } catch (Exception e) {
+//            logger.error("Exception:{}", LogbackUtil.expection2Str(e));
+//        }
+//
+//        return (html == "" || html == null) ? "0" : html;
+//
+//    }
 
 
     /**
@@ -202,13 +203,11 @@ public class AwsController {
     @ResponseBody
     Object deleteTwUsers(@RequestBody List<String> ids) {
         List<String> unSuccess = new ArrayList<>();
-
         if (ids == null) {
             return new ErrorResponse.Builder(-1, "has no ids");
         }
         for (String id : ids) {
             try {
-                logger.info("Delete Tw Monitor user : {}", id);
                 deleteTwUser(id);
             } catch (Exception e) {
                 logger.error("Exception:{}", LogbackUtil.expection2Str(e));
@@ -245,23 +244,38 @@ public class AwsController {
         if (result == "-1") {
             return "-1";
         }
+        //插入监控用户列表
         daoServer.addGplusListern(person.getId(), person.getDisplayName());
+        //插入用户详细信息列表
         daoServer.addGplusUserInfo(personInfo);
+        //插入新增用户信息列表
+        daoServer.insertCurrentUser(new CurrentUserInfo(person.getId(),person.getDisplayName(),"gp"));
         return "0";
     }
 
+    /**
+     * POST用户信息数据到指定接口，并将这些信息存库
+     */
     private String insertIntoTwitterUserInfos(User person) {
 
         TwitterUserInfos personInfo = getTwitterUserInfos(person);
         logger.info("POST Twitter 用户详细信息到solr接口并插入用户信息详情表！！");
         String url = getPostUrl("guobao.twitter.url");
         String result = HttpClientPost.postData(url, JsonUtils.toJson(personInfo));
-//        String result = RestletPost.postData(url,JsonUtils.toJson(personInfo));
-        System.out.println("post result :" + result);
+        logger.info("post result :" + result);
         if (result == "-1") {
             return "-1";
         }
-        daoServer.addTwitterUserInfo(personInfo);
+        try{
+            //插入Twitter监控用户列表
+            daoServer.addTwitterListern(String.valueOf(person.getId()),person.getScreenName(),1L);
+            //插入用户详细信息列表
+            daoServer.addTwitterUserInfo(personInfo);
+        } catch (Exception e){
+            logger.error("error");
+        }
+        //插入新增用户信息列表
+        daoServer.insertCurrentUser(new CurrentUserInfo(Long.toString(person.getId()), person.getScreenName(), "tw"));
         return "0";
     }
 
@@ -277,7 +291,9 @@ public class AwsController {
      * 解除Twitter好友关系，并从数据库删除该用户的详细信息
      */
     private void deleteTwUser(String id){
+        //从数据库中删除用户详细信息
         daoServer.delTwUserInfo(id);
+        daoServer.delTwitterListern(id);
     }
 
     private String getPostUrl(String urlName) {

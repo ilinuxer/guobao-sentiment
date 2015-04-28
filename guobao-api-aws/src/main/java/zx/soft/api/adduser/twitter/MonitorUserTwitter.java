@@ -1,6 +1,5 @@
 package zx.soft.api.adduser.twitter;
 
-import com.jimbo.json.JsonUtils;
 import com.jimbo.log.LogbackUtil;
 import com.jimbo.math.RandomNum;
 import org.slf4j.Logger;
@@ -55,7 +54,33 @@ public class MonitorUserTwitter {
         return result;
     }
 
-    public List<User> destoryFriendship(String id) throws TwitterException {
+    /**
+     * 使用官方接口，给定ScreenName返回用户详细信息
+     */
+    public User showPerson(String name){
+        List<TwitterToken> tokens = getTokens();
+        TwitterToken token = tokens.get(tokens.size()-1);
+        Properties properties = TwitterAppConfig.getProp("twitter-apps.properties");
+        String consumerKey = properties.getProperty("consumer.key");
+        String consumerSecret = properties.getProperty("consumer.secret");
+        User result;
+        Twitter twitter = new TwitterFactory().getInstance();
+        twitter.setOAuthConsumer(consumerKey,consumerSecret);
+        twitter.setOAuthAccessToken(new AccessToken(token.getTokenkey(),token.getTokenSecret()));
+        try {
+            logger.info("通过官方接口获取Twitter用户 ：" + name + " 的详细信息");
+            result = twitter.showUser(name);
+        } catch (TwitterException e) {
+            logger.error("Exception : {}" , LogbackUtil.exception2Str(e));
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    /**
+     * 删除监控用户
+     */
+    public List<User> destoryFriendship(String name) throws TwitterException {
         List<User> result = new LinkedList<>();
         User user = null;
         List<TwitterToken> tokens = getTokens();
@@ -66,9 +91,8 @@ public class MonitorUserTwitter {
             Twitter twitter = new TwitterFactory().getInstance();
             twitter.setOAuthConsumer(consumerKey, consumerSecret);
             twitter.setOAuthAccessToken(new AccessToken(token.getTokenkey(), token.getTokenSecret()));
-
             try{
-                user = twitter.destroyFriendship(Long.getLong(id));
+                user = twitter.destroyFriendship(name);
                 logger.info("删除用户");
             }catch (Exception e){
                 logger.error("下一用户");
@@ -78,8 +102,6 @@ public class MonitorUserTwitter {
         }
         return result;
     }
-
-
 
     public static List<TwitterToken> getTokens(){
         List<TwitterToken> tokens = server.getTwitterTokens();

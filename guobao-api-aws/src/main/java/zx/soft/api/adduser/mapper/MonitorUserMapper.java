@@ -3,11 +3,9 @@ package zx.soft.api.adduser.mapper;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
-import zx.soft.api.domain.GplusApp;
-import zx.soft.api.domain.GplusUserInfos;
-import zx.soft.api.domain.TwitterToken;
-import zx.soft.api.domain.TwitterUserInfos;
+import zx.soft.api.domain.*;
 import zx.soft.model.aws.SimpleUser;
+import zx.soft.model.user.CurrentUserInfo;
 
 import java.util.List;
 
@@ -56,6 +54,18 @@ public interface MonitorUserMapper {
     public void addGplusUserInfo(GplusUserInfos gplusUserInfos);
 
     /**
+     * 添加Twitte监控用户信息到数据库
+     */
+    @Insert("INSERT INTO `user_monitor_twitter` (`user_id`,`screen_name`,`since_id`,`lasttime`) VALUES (#{0},#{1},#{2},NOW()) ")
+    public void addTwitterListern(String userId,String userName,long sinceId);
+
+    /**
+     * 删除Twitter监控用户信息
+     */
+    @Delete("DELETE FROM `user_monitor_twitter` WHERE `user_id` = #{0}")
+    public void delTwitterListern(String userId);
+
+    /**
      * 添加Twitter用户基本信息到数据库
      */
     @Insert("INSERT INTO `user_info_twitter` (`id`,`name`,`screen_name`,`profile_image_url`," +
@@ -84,5 +94,23 @@ public interface MonitorUserMapper {
      */
     @Delete("DELETE FROM `user_info_twitter` WHERE `id` = #{0}")
     public void delTwUserInfo(String id);
+
+    /**
+     * 将新增用户插入新增用户信息列表
+     */
+    @Insert("INSERT INTO `current_user_info` (`user_id`,`user_name`,`sns`,`lasttime`) VALUES (#{userId},#{userName},#{sns},NOW())")
+    public void insertCurrentUser(CurrentUserInfo userInfo);
+
+    /**
+     * 删除新增用户
+     */
+    @Delete("DELETE FROM `current_user_info` WHERE `user_id` = #{0}")
+    public void deleteCurrentUser(String userId);
+
+    /**
+     * 获取当前新增用户列表
+     */
+    @Select("SELECT `user_id` AS userId,`user_name` AS userName,`sns` FROM `current_user_info`")
+    public List<CurrentUserInfo> getCurrentUsers();
 
 }

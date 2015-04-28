@@ -10,7 +10,12 @@ public class TwitterUserDemo {
     public static void main(String[] args) {
         MonitorUserDaoServer daoServer = new MonitorUserDaoServer(MybatisConfig.Servers.GBXM);
 
-        daoServer.delTwUserInfo("123");
-        System.out.println("delete success");
+//        daoServer.delTwUserInfo("123");
+//        System.out.println("delete success");
+
+
+//        daoServer.addTwitterListern("123455567","测试name23");
+        daoServer.delTwitterListern("12345555");
+        System.out.println("插入结束，请检验是否插入成功！！");
     }
 }

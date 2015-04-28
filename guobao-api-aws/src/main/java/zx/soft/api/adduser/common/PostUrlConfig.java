@@ -15,7 +15,7 @@ public class PostUrlConfig {
 
     public static Properties getProp(String fileName){
         Properties result = new Properties();
-        try(InputStream inputStream = TwitterAppConfig.class.getClassLoader().getResourceAsStream(fileName)){
+        try(InputStream inputStream = PostUrlConfig.class.getClassLoader().getResourceAsStream(fileName)){
             result.load(inputStream);
             return result;
         } catch (IOException e) {
