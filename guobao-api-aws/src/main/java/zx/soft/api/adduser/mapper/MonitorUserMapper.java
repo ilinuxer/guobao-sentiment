@@ -113,4 +113,11 @@ public interface MonitorUserMapper {
     @Select("SELECT `user_id` AS userId,`user_name` AS userName,`sns` FROM `current_user_info`")
     public List<CurrentUserInfo> getCurrentUsers();
 
+    /**
+     * 判断current_user_info表中是否存在某用户
+     */
+    @Select("SELECT 1 FROM `current_user_info` WHERE `user_id` = #{0} LIMIT 1 ")
+    public Object isExits(String userId);
+
+
 }

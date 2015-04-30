@@ -1,5 +1,6 @@
 package zx.soft.api.adduser.dao.server;
 
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
@@ -145,7 +146,7 @@ public class MonitorUserDaoServer {
        logger.info("add monitor to " + userName);
         try(SqlSession sqlSession = sqlSessionFactory.openSession()){
             MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
-            monitor.addTwitterListern(userId,userName,sinceId);
+            monitor.addTwitterListern(userId, userName, sinceId);
         }
     }
 
@@ -191,6 +192,20 @@ public class MonitorUserDaoServer {
             result = monitor.getCurrentUsers();
         }
         return result;
+    }
+
+    /**
+     * 判断current_user_info表中是否存在某用户
+     */
+    public boolean isExits(String userId){
+        try(SqlSession sqlSession = sqlSessionFactory.openSession()){
+            MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
+            Object object = monitor.isExits(userId);
+            if (object == null){
+                return false;
+            }
+            return true;
+        }
     }
 
 

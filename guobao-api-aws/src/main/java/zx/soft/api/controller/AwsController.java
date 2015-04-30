@@ -287,6 +287,9 @@ public class AwsController {
      * 数据库中删除gplus监控用户与用户详细信息
      */
     private void deleteGplusUser(String id) {
+        if (daoServer.isExits(id)){
+            daoServer.deleteCurrentUser(id);
+        }
         daoServer.delGplusMonitorInfo(id);
         daoServer.delGplusUserInfo(id);
     }
@@ -295,6 +298,9 @@ public class AwsController {
      * 解除Twitter好友关系，并从数据库删除该用户的详细信息
      */
     private void deleteTwUser(String id){
+        if (daoServer.isExits(id)){
+            daoServer.deleteCurrentUser(id);
+        }
         //从数据库中删除用户详细信息
         daoServer.delTwUserInfo(id);
         daoServer.delTwitterListern(id);

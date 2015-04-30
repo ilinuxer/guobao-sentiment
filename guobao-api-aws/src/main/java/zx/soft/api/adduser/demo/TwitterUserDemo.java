@@ -15,7 +15,8 @@ public class TwitterUserDemo {
 
 
 //        daoServer.addTwitterListern("123455567","测试name23");
-        daoServer.delTwitterListern("12345555");
+//        daoServer.delTwitterListern("12345555");
+        System.out.println(daoServer.isExits("23213213"));
         System.out.println("插入结束，请检验是否插入成功！！");
     }
 }
