@@ -1,10 +1,12 @@
 package zx.soft.api.adduser.dao.server;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.tools.asm.TryData;
 import zx.soft.api.adduser.common.MybatisConfig;
 import zx.soft.api.adduser.mapper.MonitorUserMapper;
 import zx.soft.api.domain.*;
@@ -208,5 +210,14 @@ public class MonitorUserDaoServer {
         }
     }
 
+    /**
+     * 新增tweet跟踪信息
+     */
+    public void insertStatus(SimpleStatus status){
+        try(SqlSession sqlSession = sqlSessionFactory.openSession()){
+            MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
+            monitor.insertStatus(status);
+        }
 
+    }
 }
