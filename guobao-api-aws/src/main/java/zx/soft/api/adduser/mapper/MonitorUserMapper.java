@@ -56,7 +56,7 @@ public interface MonitorUserMapper {
     /**
      * 添加Twitte监控用户信息到数据库
      */
-    @Insert("INSERT INTO `user_monitor_twitter` (`user_id`,`screen_name`,`since_id`) VALUES (#{0},#{1},#{2}) ")
+    @Insert("INSERT INTO `user_monitor_twitter` (`user_id`,`screen_name`,`since_id`,`lasttime`) VALUES (#{0},#{1},#{2},NOW()) ")
     public void addTwitterListern(String userId,String userName,long sinceId);
 
     /**
@@ -120,9 +120,15 @@ public interface MonitorUserMapper {
     public Object isExits(String userId);
 
     /**
-     * 新增tweet跟踪信息
+     * 新增推文跟踪信息
      */
     @Insert("INSERT INTO `status_monitor` (`status_id`,`status_sns`,`lasttime`) VALUES (#{statusId},#{sns},NOW())")
     public void insertStatus(SimpleStatus status);
+
+    /**
+     * 删除跟踪推文信息
+     */
+    @Delete("DELETE FROM `status_monitor` WHERE `status_id` = #{0}")
+    public void delStatus(String statusId);
 
 }

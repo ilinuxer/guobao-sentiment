@@ -1,12 +1,9 @@
 package zx.soft.api.adduser.dao.server;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.tools.asm.TryData;
 import zx.soft.api.adduser.common.MybatisConfig;
 import zx.soft.api.adduser.mapper.MonitorUserMapper;
 import zx.soft.api.domain.*;
@@ -145,11 +142,11 @@ public class MonitorUserDaoServer {
      * 添加Twitte监控用户信息到数据库
      */
     public void addTwitterListern(String userId,String userName,long sinceId){
-       logger.info("add monitor to " + userName);
         try(SqlSession sqlSession = sqlSessionFactory.openSession()){
             MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
             monitor.addTwitterListern(userId, userName, sinceId);
         }
+        logger.info("add monitor listern to " + userName + "success!");
     }
 
     /**
@@ -218,6 +215,17 @@ public class MonitorUserDaoServer {
             MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
             monitor.insertStatus(status);
         }
+        logger.info("add {} status focus success",status.getStatusId());
+    }
 
+    /**
+     * 删除跟踪推文信息
+     */
+    public void delStatus(String statusId){
+        try(SqlSession sqlSession = sqlSessionFactory.openSession()){
+            MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
+            monitor.delStatus(statusId);
+        }
+        logger.info("delete {} status focused success",statusId);
     }
 }

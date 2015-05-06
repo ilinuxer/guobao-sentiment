@@ -52,7 +52,7 @@ public class AwsController {
                 try {
 //                    User person = monitorTwitter.createFriendship(userName);
                     User person = monitorTwitter.showPerson(userName);
-                    logger.info("添加关注 ： id:" + person.getId() + "  name:" + userName);
+                    logger.info("add twitter id:" + person.getId() + "  name:" + userName);
                     if (person != null) {
                         String result1 = action.insertIntoTwitterUserInfos(person);
                         System.out.println(result1);
@@ -148,6 +148,36 @@ public class AwsController {
         } catch (Exception e) {
             logger.error("Exception:{}", LogbackUtil.expection2Str(e));
             unSuccess.add(status.getStatusId());
+        }
+        if (unSuccess.size() > 0) {
+            return new PostResponse(-1, unSuccess);
+        } else {
+            return new PostResponse(0, null);
+        }
+    }
+
+    /**
+     * 删除status 跟踪
+     */
+    @RequestMapping(value = "/delstatus",method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    @ResponseBody
+    Object delFocusGp(@RequestBody List<String> statusIds){
+        List<String> unSuccess = new ArrayList<>();
+        if (statusIds == null){
+            return new ErrorResponse.Builder(-1,"has no id");
+        }
+        for (String statusId:statusIds){
+            try {
+                logger.info("delete Focus on status : {}", statusId);
+                //添加到关注列表（以定时获取评论信息）
+                action.delStatus(statusId);
+            } catch (Exception e) {
+                logger.error("Exception:{}", LogbackUtil.expection2Str(e));
+                unSuccess.add(statusId);
+            }
+
         }
         if (unSuccess.size() > 0) {
             return new PostResponse(-1, unSuccess);

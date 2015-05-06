@@ -82,8 +82,10 @@ public class AwsControllerAction {
             outterResult = "-1";
         }
         try{
+            logger.info("开始插入数据库");
             //插入Twitter监控用户列表
             daoServer.addTwitterListern(String.valueOf(person.getId()), person.getScreenName(), 1L);
+            logger.info("listern success");
             //插入用户详细信息列表
             daoServer.addTwitterUserInfo(personInfo);
             //插入新增用户信息列表
@@ -104,6 +106,15 @@ public class AwsControllerAction {
             daoServer.insertStatus(status);
         }catch (Exception e){
             logger.error("insert into status error : {}" ,e);
+        }
+    }
+
+
+    protected void delStatus(String statusId){
+        try{
+            daoServer.delStatus(statusId);
+        }catch (Exception e){
+            logger.error("delete status error : {}",e);
         }
     }
 
