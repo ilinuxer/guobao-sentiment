@@ -221,10 +221,10 @@ public class MonitorUserDaoServer {
     /**
      * 删除跟踪推文信息
      */
-    public void delStatus(String statusId){
+    public void delStatus(String statusId,String sns){
         try(SqlSession sqlSession = sqlSessionFactory.openSession()){
             MonitorUserMapper monitor = sqlSession.getMapper(MonitorUserMapper.class);
-            monitor.delStatus(statusId);
+            monitor.delStatus(statusId,sns);
         }
         logger.info("delete {} status focused success",statusId);
     }

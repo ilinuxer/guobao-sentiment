@@ -110,9 +110,9 @@ public class AwsControllerAction {
     }
 
 
-    protected void delStatus(String statusId){
+    protected void delStatus(String statusId,String sns){
         try{
-            daoServer.delStatus(statusId);
+            daoServer.delStatus(statusId,sns);
         }catch (Exception e){
             logger.error("delete status error : {}",e);
         }

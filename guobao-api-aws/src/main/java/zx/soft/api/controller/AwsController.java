@@ -163,19 +163,19 @@ public class AwsController {
     @ResponseStatus(HttpStatus.CREATED)
     public
     @ResponseBody
-    Object delFocusGp(@RequestBody List<String> statusIds){
+    Object delFocusGp(@RequestBody List<SimpleStatus> statuses){
         List<String> unSuccess = new ArrayList<>();
-        if (statusIds == null){
-            return new ErrorResponse.Builder(-1,"has no id");
+        if (statuses == null){
+            return new ErrorResponse.Builder(-1,"has no status");
         }
-        for (String statusId:statusIds){
+        for (SimpleStatus status:statuses){
             try {
-                logger.info("delete Focus on status : {}", statusId);
+                logger.info("delete Focus on status : {}", status.getStatusId());
                 //添加到关注列表（以定时获取评论信息）
-                action.delStatus(statusId);
+                action.delStatus(status.getStatusId(),status.getSns());
             } catch (Exception e) {
                 logger.error("Exception:{}", LogbackUtil.expection2Str(e));
-                unSuccess.add(statusId);
+                unSuccess.add(status.getStatusId());
             }
 
         }

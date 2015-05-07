@@ -128,7 +128,7 @@ public interface MonitorUserMapper {
     /**
      * 删除跟踪推文信息
      */
-    @Delete("DELETE FROM `status_monitor` WHERE `status_id` = #{0}")
-    public void delStatus(String statusId);
+    @Delete("DELETE FROM `status_monitor` WHERE `status_id` = #{0} AND `status_sns` = #{1}")
+    public void delStatus(String statusId,String sns);
 
 }
