@@ -12,7 +12,6 @@ import zx.soft.api.adduser.post.HttpClientPost;
 import zx.soft.api.domain.GplusUserInfos;
 import zx.soft.api.domain.SimpleStatus;
 import zx.soft.api.domain.TwitterUserInfos;
-import zx.soft.model.user.CurrentUserInfo;
 import zx.soft.utils.time.TimeUtils;
 
 import java.util.Properties;
@@ -31,7 +30,8 @@ public class AwsControllerAction {
 
     protected TwitterUserInfos getTwitterUserInfos(User person) {
         return new TwitterUserInfos(person.getId(), person.getName(),
-                person.getScreenName(), person.getProfileImageURL(), TimeUtils.transStrToCommonDateStr(person.getCreatedAt().toString()),
+                person.getScreenName(), person.getProfileImageURL(),
+                TimeUtils.transStrToCommonDateStr(person.getCreatedAt().toString()),
                 person.getLocation(), person.getURL(), person.getFavouritesCount(), person.getUtcOffset(),
                 person.getListedCount(), person.getFollowersCount(), person.getLang(), person.getDescription(),
                 person.isVerified(), person.getTimeZone(), person.getStatusesCount(), person.getFriendsCount());
@@ -57,11 +57,11 @@ public class AwsControllerAction {
             //插入用户详细信息列表    "user_info_googleplus"
             daoServer.addGplusUserInfo(personInfo);
             //插入新增用户信息列表    "current_user_info"
-            daoServer.insertCurrentUser(new CurrentUserInfo(person.getId(), person.getDisplayName(), "gp"));
+            //此处暂时去除，因为新增用户既在新增用户信息列表，又在用户信息监控列表
+            //daoServer.insertCurrentUser(new CurrentUserInfo(person.getId(), person.getDisplayName(), "gp"));
         }catch (Exception e ){
             logger.error("Exception {}",e);
             outterResult = "-1";
-
         }
         return outterResult;
     }
@@ -89,10 +89,10 @@ public class AwsControllerAction {
             //插入用户详细信息列表
             daoServer.addTwitterUserInfo(personInfo);
             //插入新增用户信息列表
-            daoServer.insertCurrentUser(new CurrentUserInfo(Long.toString(person.getId()), person.getScreenName(), "tw"));
+//            daoServer.insertCurrentUser(new CurrentUserInfo(Long.toString(person.getId()), person.getScreenName(), "tw"));
         } catch (Exception e){
             outterResult = "-1";
-            logger.error("error");
+            logger.error(" insert into database error");
         }
 
         return outterResult;

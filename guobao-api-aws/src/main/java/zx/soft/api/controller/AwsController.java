@@ -45,12 +45,11 @@ public class AwsController {
         String result = "0";
         String sns = user.getSns();
         String userName = user.getName();
-        String url = user.getUid();
+        String url = user.getUid().toLowerCase();
         try {
             if ("tw".equals(sns)) {
                 //添加twitter用户
                 try {
-//                    User person = monitorTwitter.createFriendship(userName);
                     User person = monitorTwitter.showPerson(userName);
                     logger.info("add twitter id:" + person.getId() + "  name:" + userName);
                     if (person != null) {
@@ -75,6 +74,7 @@ public class AwsController {
 
             } else if ("gp".equals(sns)) {
                 //添加gplus用户
+                System.out.println(userName);
                 List<Person> people = monitorGplus.createFriendship(userName);
                 logger.info("people size is :" + people.size());
                 if (people == null | people.size() == 0) {
@@ -89,19 +89,14 @@ public class AwsController {
                         result = "-1";
                     }
                 } else {
-                    String lowUserName = userName.replaceAll("\\s", "").replaceAll("\\(", "").replaceAll("\\)", "").toLowerCase();
                     for (Person person : people) {
                         String id = person.getId();
-                        if (person.getUrl().contains(lowUserName)) {
-                            String insertResult = action.insertIntoGplusUserDB(person);
-                            if (insertResult == "0") {
-                                result = person.getId();
-                            } else {
-                                result = "-1";
-                            }
-                            break;
-                        }
-                        if (url.contains(id)) {
+                        String name = person.getDisplayName();
+                        String sourceUrl = person.getUrl();
+
+                        logger.info("userName : {} inputName : {} ",name,userName);
+                        if (userName.trim().equals(name) && EncodeUrl.isPerson(url,sourceUrl)){
+                            logger.info("search user {} success",name);
                             String insertResult = action.insertIntoGplusUserDB(person);
                             if (insertResult == "0") {
                                 result = person.getId();

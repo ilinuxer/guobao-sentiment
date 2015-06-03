@@ -44,7 +44,7 @@ public interface MonitorUserMapper {
      * 添加Gplus用户的ID与name到数据库
      * 作用是对用户进行监控
      */
-    @Insert("INSERT INTO `googleUserInfos` (`userId`,`userName`,`lastUpdateTime`) VALUES (#{0},#{1},NOW())")
+    @Insert("INSERT INTO `googleUserInfos` (`userId`,`userName`) VALUES (#{0},#{1})")
     public void addGplusListern(String uid, String name);
 
     /**
