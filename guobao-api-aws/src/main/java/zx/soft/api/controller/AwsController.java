@@ -37,7 +37,7 @@ public class AwsController {
     @ResponseStatus(HttpStatus.CREATED)
     public
     @ResponseBody
-    String createUsers(@RequestBody SimpleUser user) {
+    Object createUsers(@RequestBody SimpleUser user) {
         if (user == null) {
             return "-1";
         }
@@ -46,17 +46,18 @@ public class AwsController {
         String sns = user.getSns();
         String userName = user.getName();
         String url = user.getUid().toLowerCase();
+        List<String> success = new ArrayList<>();
         try {
             if ("tw".equals(sns)) {
+
                 //添加twitter用户
                 try {
                     User person = monitorTwitter.showPerson(userName);
                     logger.info("add twitter id:" + person.getId() + "  name:" + userName);
                     if (person != null) {
                         String result1 = action.insertIntoTwitterUserInfos(person);
-                        System.out.println(result1);
                         if (result1 == "0") {
-                            result = person.getId() + "";
+                            result = person.getId() +","+person.getName();
                         } else if (result1 == "-1") {
                             result = "-1";
                         } else {
@@ -69,22 +70,24 @@ public class AwsController {
                 } catch (Exception e) {
                     logger.error("Exception{}:" + LogbackUtil.expection2Str(e));
                     result = "-1";
+//                    success.add("-1");
+//                    return new PostResponse(-1,success);
                 }
 
 
             } else if ("gp".equals(sns)) {
                 //添加gplus用户
-                System.out.println(userName);
                 List<Person> people = monitorGplus.createFriendship(userName);
                 logger.info("people size is :" + people.size());
                 if (people == null | people.size() == 0) {
-                    result = "0";
+                    success.add("0");
+                    return new PostResponse(0,success);
                 } else if (people.size() == 1) {
                     Person person = people.get(0);
                     //插入数据库
                     String insertResult = action.insertIntoGplusUserDB(person);
                     if (insertResult == "0") {
-                        result = person.getId();
+                        result = person.getId()+","+person.getDisplayName();
                     } else {
                         result = "-1";
                     }
@@ -99,7 +102,7 @@ public class AwsController {
                             logger.info("search user {} success",name);
                             String insertResult = action.insertIntoGplusUserDB(person);
                             if (insertResult == "0") {
-                                result = person.getId();
+                                result = person.getId()+","+person.getDisplayName();
                             } else {
                                 result = "-1";
                             }
@@ -112,13 +115,26 @@ public class AwsController {
                 }
             } else if ("fb".equals(sns)) {
                 //添加facebook用户
-                return "undo";
+                result = "-1";
             }
         } catch (Exception e) {
+            result = "-1";
             logger.error("Exception:{}", LogbackUtil.expection2Str(e));
-            return "-1";
         }
-        return result;
+
+        //根据result结果设置返回值
+        if (result.equals("0")){
+            success.add("0");
+            return new PostResponse(-1,success);
+        }else if (result.equals("-1")){
+            success.add("-1");
+            return new PostResponse(-1,success);
+        }else {
+            String[] results = result.split(",");
+            success.add(results[0]);
+            success.add(results[1]);
+            return new PostResponse(0,success);
+        }
     }
 
     /**
