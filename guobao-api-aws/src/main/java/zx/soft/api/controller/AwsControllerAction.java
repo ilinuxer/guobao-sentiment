@@ -53,9 +53,9 @@ public class AwsControllerAction {
         }
         try {
             //插入监控用户列表      "googleUserInfos"
-//            daoServer.addGplusListern(person.getId(), person.getDisplayName());
+            daoServer.addGplusListern(person.getId(), person.getDisplayName());
             //插入用户详细信息列表    "user_info_googleplus"
-//            daoServer.addGplusUserInfo(personInfo);
+            daoServer.addGplusUserInfo(personInfo);
             //插入新增用户信息列表    "current_user_info"
             //此处暂时去除，因为新增用户既在新增用户信息列表，又在用户信息监控列表
             //daoServer.insertCurrentUser(new CurrentUserInfo(person.getId(), person.getDisplayName(), "gp"));
@@ -84,10 +84,10 @@ public class AwsControllerAction {
         try{
             logger.info("开始插入数据库");
             //插入Twitter监控用户列表
-//            daoServer.addTwitterListern(String.valueOf(person.getId()), person.getScreenName(), 1L);
+            daoServer.addTwitterListern(String.valueOf(person.getId()), person.getScreenName(), 1L);
             logger.info("listern success");
             //插入用户详细信息列表
-//            daoServer.addTwitterUserInfo(personInfo);
+            daoServer.addTwitterUserInfo(personInfo);
             //插入新增用户信息列表
 //            daoServer.insertCurrentUser(new CurrentUserInfo(Long.toString(person.getId()), person.getScreenName(), "tw"));
         } catch (Exception e){

@@ -43,6 +43,7 @@ public class AwsController {
         }
         //"-1"--查找错误或者用户信息插入数据库失败;"0"--未查到用户;id 值表示插入成功
         String result = "0";
+        String userMessage = "0";
         String sns = user.getSns();
         String userName = user.getName();
         String url = user.getUid().toLowerCase();
@@ -57,9 +58,10 @@ public class AwsController {
                     if (person != null) {
                         String result1 = action.insertIntoTwitterUserInfos(person);
                         if (result1 == "0") {
-                            result = person.getId() +","+person.getName();
+                            result = person.getId() + "," + person.getName();
                         } else if (result1 == "-1") {
                             result = "-1";
+                            userMessage = person.getId() + "," + person.getName();
                         } else {
                             result = "0";
                         }
@@ -70,6 +72,7 @@ public class AwsController {
                 } catch (Exception e) {
                     logger.error("Exception{}:" + LogbackUtil.expection2Str(e));
                     result = "-1";
+                    userMessage = "0";
 //                    success.add("-1");
 //                    return new PostResponse(-1,success);
                 }
@@ -80,16 +83,19 @@ public class AwsController {
                 List<Person> people = monitorGplus.createFriendship(userName);
                 logger.info("people size is :" + people.size());
                 if (people == null | people.size() == 0) {
+                    //为查找到用户
                     success.add("0");
-                    return new PostResponse(0,success);
+                    return new PostResponse(0, success);
                 } else if (people.size() == 1) {
+
                     Person person = people.get(0);
                     //插入数据库
                     String insertResult = action.insertIntoGplusUserDB(person);
                     if (insertResult == "0") {
-                        result = person.getId()+","+person.getDisplayName();
+                        result = person.getId() + "," + person.getDisplayName();
                     } else {
                         result = "-1";
+                        userMessage = person.getId() + "," + person.getDisplayName();
                     }
                 } else {
                     for (Person person : people) {
@@ -97,14 +103,15 @@ public class AwsController {
                         String name = person.getDisplayName();
                         String sourceUrl = person.getUrl();
 
-                        logger.info("userName : {} inputName : {} ",name,userName);
-                        if (userName.trim().equals(name) && EncodeUrl.isPerson(url,sourceUrl)){
-                            logger.info("search user {} success",name);
+                        logger.info("userName : {} inputName : {} ", name, userName);
+                        if (userName.trim().equals(name) && EncodeUrl.isPerson(url, sourceUrl)) {
+                            logger.info("search user {} success", name);
                             String insertResult = action.insertIntoGplusUserDB(person);
                             if (insertResult == "0") {
-                                result = person.getId()+","+person.getDisplayName();
+                                result = person.getId() + "," + person.getDisplayName();
                             } else {
                                 result = "-1";
+                                userMessage = person.getId() + "," + person.getDisplayName();
                             }
                             break;
                         } else {
@@ -123,39 +130,44 @@ public class AwsController {
         }
 
         //根据result结果设置返回值
-        if (result.equals("0")){
+        if (result.equals("0")) {
+            //该情况为未查找到用户
             success.add("0");
-            return new PostResponse(-1,success);
-        }else if (result.equals("-1")){
-            success.add("-1");
-            return new PostResponse(-1,success);
-        }else {
+            return new PostResponse(-1, success);
+        } else if (result.equals("-1")) {
+            //该情况为已存在用户
+            String[] results = userMessage.split(",");
+            success.add(results[0]);
+            success.add(results[1]);
+            return new PostResponse(-1, success);
+        } else {
+            //该情况为新增用户成功
             String[] results = result.split(",");
             success.add(results[0]);
             success.add(results[1]);
-            return new PostResponse(0,success);
+            return new PostResponse(0, success);
         }
     }
 
     /**
      * status 跟踪
      */
-    @RequestMapping(value = "/status",method = RequestMethod.POST)
+    @RequestMapping(value = "/status", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public
     @ResponseBody
-    Object focusGp(@RequestBody SimpleStatus status){
+    Object focusGp(@RequestBody SimpleStatus status) {
         List<String> unSuccess = new ArrayList<>();
-        if (status == null){
-            return new ErrorResponse.Builder(-1,"has no id");
+        if (status == null) {
+            return new ErrorResponse.Builder(-1, "has no id");
         }
 
         String statusId = status.getStatusId();
         String statusSns = status.getSns();
         try {
-            logger.info("Focus "+ statusSns +" status : {}", statusId);
+            logger.info("Focus " + statusSns + " status : {}", statusId);
             //添加到关注列表（以定时获取评论信息）
-            action.insertStatus(new SimpleStatus(statusId,statusSns));
+            action.insertStatus(new SimpleStatus(statusId, statusSns));
         } catch (Exception e) {
             logger.error("Exception:{}", LogbackUtil.expection2Str(e));
             unSuccess.add(status.getStatusId());
@@ -170,20 +182,20 @@ public class AwsController {
     /**
      * 删除status 跟踪
      */
-    @RequestMapping(value = "/delstatus",method = RequestMethod.POST)
+    @RequestMapping(value = "/delstatus", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public
     @ResponseBody
-    Object delFocusGp(@RequestBody List<SimpleStatus> statuses){
+    Object delFocusGp(@RequestBody List<SimpleStatus> statuses) {
         List<String> unSuccess = new ArrayList<>();
-        if (statuses == null){
-            return new ErrorResponse.Builder(-1,"has no status");
+        if (statuses == null) {
+            return new ErrorResponse.Builder(-1, "has no status");
         }
-        for (SimpleStatus status:statuses){
+        for (SimpleStatus status : statuses) {
             try {
                 logger.info("delete Focus on status : {}", status.getStatusId());
                 //添加到关注列表（以定时获取评论信息）
-                action.delStatus(status.getStatusId(),status.getSns());
+                action.delStatus(status.getStatusId(), status.getSns());
             } catch (Exception e) {
                 logger.error("Exception:{}", LogbackUtil.expection2Str(e));
                 unSuccess.add(status.getStatusId());
